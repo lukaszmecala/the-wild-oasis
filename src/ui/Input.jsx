@@ -6,7 +6,7 @@ const Input = styled.input`
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
   background-color: var(--color-grey-0);
-  color: var(--color-brand-50);
+  color: var(--color-grey-900);
 `;
 
 export default Input;
