@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useCrateCabin } from "./useCreateCabin";
-import { useEditCabin } from "./useEditCabin";
+import { useUpdateCabin } from "./useUpdateCabin";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -9,10 +9,11 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+// eslint-disable-next-line react/prop-types
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editid, ...editValues } = cabinToEdit;
   const { createCabin, isCreating } = useCrateCabin();
-  const { editCabin, isEditing } = useEditCabin();
+  const { updateCabin, isEditing } = useUpdateCabin();
 
   const isWorking = isCreating || isEditing;
 
@@ -28,13 +29,22 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       typeof dataForm.image === "string" ? dataForm.image : dataForm.image[0];
     console.log(image);
     if (isEditSession)
-      editCabin({ newCabinData: { ...dataForm, image: image }, id: editid });
+      updateCabin(
+        { newCabinData: { ...dataForm, image: image }, id: editid },
+        {
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          },
+        }
+      );
     else
       createCabin(
         { ...dataForm, image: image },
         {
           onSuccess: () => {
             reset();
+            onCloseModal?.();
           },
         }
       );
@@ -45,7 +55,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModal ? "modal" : "regulaar"}
+    >
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -128,7 +141,11 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       </FormRow>
 
       <FormRow>
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>
