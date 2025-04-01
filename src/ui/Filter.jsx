@@ -49,6 +49,7 @@ function Filter({ filterValue, options }) {
         <FilterButton
           key={option.value}
           active={searchParams.get(filterValue) === option.value}
+          disabled={searchParams.get(filterValue) === option.value}
           onClick={() => handleClick(option.value)}
         >
           {option.label}
